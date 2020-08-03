@@ -2,25 +2,22 @@ const express = require('express');
 const app = express();
 const connectDB = require('./MongoConnect');
 const mongoose = require('mongoose');
+const Score = require('./models/ScoreSchema');
 
 connectDB();
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
-    const kittySchema = new mongoose.Schema({
-        name: String
+
+    Score.findByIdAndRemove('5f288a8fea47a00055835095', function(err, doc){
+        console.log(doc + " something removed!!");
+        Score.find(function (err, scores) {
+            if (err) return console.error(err);
+            console.log(scores.sort((a, b) => a.score - b.score));
+        });
     });
 
-    const Kitten = mongoose.model('Kitten', kittySchema);
-
-    const silence = new Kitten( {name: "Silence :)"} );
-    console.log(silence.name);
-
-    silence.save(function (err, fluffy) {
-        if (err) return console.error(err);
-        console.log("Silence has been saved to the DB :)");
-    });
 });
 
 const PORT = process.env.PORT || 2800;
